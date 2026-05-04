@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>About Me</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a90e2 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 4em;
+            background: linear-gradient(45deg, #fff, #a8d0e6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px #4a90e2); }
+            to { filter: drop-shadow(0 0 30px #667eea); }
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        nav a:hover {
+            background: #4a90e2;
+            border-color: #fff;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(74,144,226,0.5);
+        }
+
+        section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4a90e2, #667eea, #1e3c72);
+        }
+
+        section:hover {
+            transform: translateY(-10px);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 30px 70px rgba(74,144,226,0.4);
+        }
+
+        p {
+            font-size: 1.4em;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+
+        .info-list {
+            display: grid;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 20px;
+            border-left: 5px solid #4a90e2;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .info-item:hover {
+            transform: translateX(15px);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(74,144,226,0.3);
+        }
+
+        .info-icon {
+            position: absolute;
+            top: -10px;
+            left: 25px;
+            background: linear-gradient(135deg, #4a90e2, #667eea);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 5px 20px rgba(74,144,226,0.5);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.8em;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            nav a {
+                padding: 12px 25px;
+                width: 200px;
+            }
+            
+            section {
+                padding: 30px 25px;
+            }
+            
+            p {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💙 About Me</h1>
+        <nav>
+            <a href="index.html">🏠 Home</a>
+            <a href="about.html">ℹ️ About</a>
+            <a href="diary.html">📝 Diary</a>
+            <a href="gallery.html">🖼️ Gallery</a>
+            <a href="contact.html">✉️ Contact</a>
+        </nav>
+    </header>
+
+    <section>
+        <div class="info-list">
+            <div class="info-item">
+                <div class="info-icon">👩‍💻</div>
+                <p>Name: Diocena,Jabez Ann M.</p>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">🎓</div>
+                <p>Course: Bachelor of Science Information Technology</p>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">🚀</div>
+                <p>Favorite Colors: Blue and Green — calm outside, chaotic inside.</p>
+
+                    <p>Favorite Song: Pahintulot — because feelings hit harder with music.</p>
+
+                   <p> Sports: Basketball and Cycling — cardio when I feel productive.</p>
+
+                    <p>Hobbies: Playing games — professionally wasting time with skill.</p>
+
+                    <p>Everyday Need: Money — because water is free but everything else isn’t.</p>
+
+                    <p>Current Goal: Build a better physique and grow my triceps — slowly becoming my own upgrade patch.</p>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
