@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Diary - Big Beautiful Photos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #7a7da7 0%, #4c6cd4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        nav {
+            margin-top: 20px;
+        }
+
+        nav a {
+            display: inline-block;
+            margin: 0 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 35px;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .story-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            max-height: 550px;
+        }
+
+        .story-card.expanded {
+            max-height: 1400px;
+            grid-column: 1 / -1;
+            transform: scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+        }
+
+        .card-preview {
+            position: relative;
+        }
+
+        .card-preview img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+            color: white;
+            padding: 40px 30px 30px;
+        }
+
+        .preview-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .preview-text {
+            font-size: 1.1em;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .expand-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255,255,255,0.95);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .story-card.expanded .expand-icon {
+            background: #ff6b6b;
+            color: white;
+            transform: rotate(45deg);
+        }
+
+        .full-content {
+            padding: 40px;
+            display: none;
+        }
+
+        .story-card.expanded .full-content {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .story-title {
+            color: #2c3e50;
+            font-size: 2.3em;
+            margin-bottom: 20px;
+            border-bottom: 4px solid #4a90e2;
+            padding-bottom: 15px;
+            text-align: center;
+        }
+
+        .story-text {
+            color: #444;
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            text-align: justify;
+        }
+
+        /* SLIDABLE PHOTO GRID */
+        .photo-grid {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.1) 100%);
+            padding: 20px 0;
+        }
+
+        .photo-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .photo-grid::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .photo-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #4a90e2, #667eea);
+            border-radius: 10px;
+        }
+
+        .photo-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #357abd, #5a67d8);
+        }
+
+        .photo-list {
+            display: flex;
+            gap: 20px;
+            padding: 0 20px;
+            scroll-behavior: smooth;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            -ms-overflow-style: none;
+            scroll-snap-type: x mandatory;
+        }
+
+        .photo-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .photo-item {
+            flex: 0 0 280px;
+            scroll-snap-align: start;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+            border: 4px solid transparent;
+            cursor: grab;
+        }
+
+        .photo-grid img:hover,
+        .photo-grid img:active {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #4a90e2;
+            box-shadow: 0 20px 50px rgba(74, 144, 226, 0.4);
+            cursor: grab;
+        }
+
+        .photo-grid img:active {
+            cursor: grabbing;
+        }
+
+        /* Navigation arrows */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .scroll-arrow:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .scroll-left {
+            left: 10px;
+        }
+
+        .scroll-right {
+            right: 10px;
+        }
+
+        /* SPECIAL LAYOUTS */
+        .photo-grid.many-photos .photo-item {
+            flex: 0 0 220px;
+        }
+
+        .photo-grid.many-photos img {
+            height: 220px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .photo-item {
+                flex: 0 0 250px;
+            }
+            
+            .photo-grid img {
+                height: 220px;
+            }
+            
+            .photo-grid.many-photos .photo-item {
+                flex: 0 0 200px;
+            }
+            
+            .photo-grid.many-photos img {
+                height: 180px;
+            }
+            
+            .story-card.expanded {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📖 My Diary Stories</h1>
+        <nav>
+            <a href="index.html">🏠 Home</a>
+            <a href="about.html">ℹ️ About</a>
+            <a href="diary.html">📝 Diary</a>
+            <a href="gallery.html">🖼️ Gallery</a>
+            <a href="contact.html">✉️ Contact</a>
+        </nav>
+    </header>
+
+    <div class="grid-container">
+        <!-- STORY 1 -->
+        <div class="story-card" onclick="toggleCard(this)">
+            <div class="card-preview">
+                <img src="cc.jpg" alt="First day of college">
+                <div class="preview-overlay">
+                    <div class="preview-title">2nd Year Journey</div>
+                    <div class="preview-text">My college adventure begins at Collegio de Santa Teresa!</div>
+                </div>
+                <div class="expand-icon">👀</div>
+            </div>
+            <div class="full-content">
+                <h3 class="story-title">🎓 2nd Year Journey</h3>
+                <p class="story-text">In my second-year journey as an IT student, I experienced a lot of stress and challenges. 
+                    There were many times when we had to submit projects and activities on short notice. 
+                    My second year was also quite expensive because of the many requirements, contributions, and group expenses.
+                     Despite all of that, I am close to finishing my second year and moving on to my third year.
+
+As I prepare for third year, I am getting myself ready for the tasks and challenges ahead—especially in hardware and software, which are very important in the field of IT.
+ It is essential to apply and understand how these technologies work and how they can help society. I am ready and excited for what's ahead, even though I know it will be stressful.</p>
+                
+                <div class="photo-grid">
+                    <button class="scroll-arrow scroll-left" onclick="scrollPhotoGrid(this)">‹</button>
+                    <button class="scroll-arrow scroll-right" onclick="scrollPhotoGrid(this)">›</button>
+                    <div class="photo-list">
+                        <div class="photo-item"><img src="1st.png" alt="Campus entrance"></div> <div class="photo-item"><img src="este.jpg" alt="Classroom vibes"></div>
+                        <div class="photo-item"><img src="me.jpg" alt="With friends"></div> <div class="photo-item"><img src="memaw.jpg" alt="Classroom vibes"></div>
+                        <div class="photo-item"><img src="j.jpg" alt="Classroom vibes"></div>  <div class="photo-item"><img src="tdh.jpg" alt="Classroom vibes"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STORY 2 CPRO SYSTEM -->
+        <div class="story-card" onclick="toggleCard(this)">
+            <div class="card-preview">
+                <img src="o.png" alt="CPRO group">
+                <div class="preview-overlay">
+                    <div class="preview-title">CPRO System</div>
+                    <div class="preview-text">Research group</div>
+                </div>
+                <div class="expand-icon">👀</div>
+            </div>
+            <div class="full-content">
+                <h3 class="story-title">🤝 CPRO System</h3>
+                <p class="story-text">Why CPRO System? It all started during our first year when we were tasked to create a system individually.
+                     Although the project was meant to be done alone, we chose to work closely together so we could ask each other questions, share ideas, and help one another,
+                      since the systems assigned to us were quite difficult. Even though each of us had different projects, all of them were challenging, so we supported each other throughout the process.That was how our group was formed. We grew closer because we understood one another, shared the same sense of humor, and had no hard feelings or conflicts. 
+Everything felt genuine, and together we created many happy memories.</p>
+                
+                <div class="photo-grid">
+                    <button class="scroll-arrow scroll-left" onclick="scrollPhotoGrid(this)">‹</button>
+                    <button class="scroll-arrow scroll-right" onclick="scrollPhotoGrid(this)">›</button>
+                    <div class="photo-list">
+                        <div class="photo-item"><img src="ro.jpg" alt="CPRO group photo"></div>
+                        <div class="photo-item"><img src="sys.jpg" alt="Mall food trip"></div>
+                        <div class="photo-item"><img src="ka.jpg" alt="Research session"></div>
+                        <div class="photo-item"><img src="o.png"></div>
+                        <div class="photo-item"><img src="p.png"></div>
+                        <div class="photo-item"><img src="hil.jpg"></div>
+                        <div class="photo-item"><img src="gym.jpg"></div>
+                    </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STORY 3 - COLLAB HOUSE -->
+        <div class="story-card" onclick="toggleCard(this)">
+            <div class="card-preview">
+                <img src="r.png" alt="Collab House">
+                <div class="preview-overlay">
+                    <div class="preview-title">Collab House</div>
+                    <div class="preview-text"></div>
+                </div>
+                <div class="expand-icon">👀</div>
+            </div>
+            <div class="full-content">
+                <h3 class="story-title">🏠 Collab House Memories</h3>
+                <p class="story-text">After the first semester of our first year, the second semester came and we met another circle of friends. That was when Collab House was formed—by bringing our groups together. It was exciting because we had more people with us and got to build new friendships.
+
+We're thankful for them because they help and support us, and whenever someone needs company or assistance, we study together, work together, and accomplish our activities as a team.</p>
+                
+                <div class="photo-grid many-photos">
+                    <button class="scroll-arrow scroll-left" onclick="scrollPhotoGrid(this)">‹</button>
+                    <button class="scroll-arrow scroll-right" onclick="scrollPhotoGrid(this)">›</button>
+                    <div class="photo-list">
+                        <div class="photo-item"><img src="r.png" alt="Collab House group"></div>
+                        <div class="photo-item"><img src="i.jpg" alt="Everyone together"></div>
+                        <div class="photo-item"><img src="girly.png" alt="Girl besties"></div>
+                        <div class="photo-item"><img src="boys.png" alt="Boy besties"></div>
+                        <div class="photo-item"><img src="f.png"></div> 
+                        <div class="photo-item"><img src="alden.jpg"></div>
+                        <div class="photo-item"><img src="sta.jpg"></div>
+                        <div class="photo-item"><img src="ria.jpg"></div>
+                        <div class="photo-item"><img src="ri.jpg"></div>
+                        <div class="photo-item"><img src="uvi.jpg"></div>
+                        <div class="photo-item"><img src="friends.jpg"></div>
+                        <div class="photo-item"><img src="si.jpg"></div>
+                        <div class="photo-item"><img src="bb.jpg"></div>
+                        <div class="photo-item"><img src="happy.jpg"></div>
+                        <div class="photo-item"><img src="hgggg.jpg"></div>
+                        <div class="photo-item"><img src="gg.jpg"></div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STORY 4 ITWEEK AND INTTRAMS -->
+        <div class="story-card" onclick="toggleCard(this)">
+            <div class="card-preview">
+                <img src="ttt.jpg" alt="Study group">
+                <div class="preview-overlay">
+                    <div class="preview-title">IT WEEK AND INTRAMS WEEK</div>
+                    <div class="preview-text">Survived with friends' help!</div>
+                </div>
+                <div class="expand-icon">👀</div>
+            </div>
+            <div class="full-content">
+                <h3 class="story-title">IT WIZARDS</h3>
+                <p class="story-text">IT Week and Intrams were some of the most enjoyable moments of our college life. From the beginning of the events until the end, everything was full of excitement, fun, and memorable experiences. We had the chance to participate in different activities, games, and competitions that allowed us to showcase our skills, talents, and teamwork. It was also a time for us to relax and take a break from academics, even just for a while.</p>
+                <p class="story-text">What made it even more special was being able to enjoy those moments with friends and classmates. We laughed, cheered for each other, and created unforgettable memories together. IT Week and Intrams were not only fun, but they also strengthened our friendships and school spirit.</p>
+                
+                <div class="photo-grid">
+                    <button class="scroll-arrow scroll-left" onclick="scrollPhotoGrid(this)">‹</button>
+                    <button class="scroll-arrow scroll-right" onclick="scrollPhotoGrid(this)">›</button>
+                    <div class="photo-list">
+                        <div class="photo-item"><img src="tra.jpg" alt="Study group"></div>
+                        <div class="photo-item"><img src="smm.jpg" alt="Notes everywhere"></div>
+                        <div class="photo-item"><img src="in.jpg"></div>
+                        <div class="photo-item"><img src="ttt.jpg"></div>
+                        <div class="photo-item"><img src="ne.jpg"></div>
+                        <div class="photo-item"><img src="mo.jpg"></div>
+                        <div class="photo-item"><img src="sweet.jpg"></div>
+                        <div class="photo-item"><img src="wah.jpg"></div>
+                    </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STORY 5 EXHIBIT -->
+        <div class="story-card" onclick="toggleCard(this)">
+            <div class="card-preview">
+                <img src="h.jpg" alt="Study group">
+                <div class="preview-overlay">
+                    <div class="preview-title">EXHIBIT 2026</div>
+                    <div class="preview-text"></div>
+                </div>
+                <div class="expand-icon">👀</div>
+            </div>
+            <div class="full-content">
+                <h3 class="story-title">E X H I B I T</h3>
+                <p class="story-text">Exhibit 2026 was a time when we felt extremely stressed and exhausted. Our project, called AGRIBOT, was designed to help with watering plants and assisting in planting for nature and agriculture. We were able to build the hardware to some extent, but we struggled a lot with the connections and coding—it was much harder than we expected.</p>
+                 <p class="story-text">We also ran short on time because many components were missing, so we had to go to places like Quiapo, Deeco, and other locations just to find the parts we needed. We managed to complete it, though it was far from perfect.</p>
+                 <p class="story-text">When presentation day came, unfortunately, the project did not work, and we felt defeated because it failed during the actual demonstration. Despite that, we were still recognized for not giving up easily and for showing up and presenting on the day itself. It taught us many valuable lessons, and most importantly, it became a meaningful experience for me and my groupmates.</p>
+                <div class="photo-grid">
+                    <button class="scroll-arrow scroll-left" onclick="scrollPhotoGrid(this)">‹</button>
+                    <button class="scroll-arrow scroll-right" onclick="scrollPhotoGrid(this)">›</button>
+                    <div class="photo-list">
+                        <div class="photo-item"><img src="e.jpg" alt="Study group"></div>
+                        <div class="photo-item"><img src="x.jpg" alt="Notes everywhere"></div>
+                        <div class="photo-item"><img src="h.jpg"></div> 
+                        <div class="photo-item"><img src="i.jpg"></div>
+                        <div class="photo-item"><img src="m.jpg"></div>
+                        <div class="photo-item"><img src="b.jpg"></div>
+                        <div class="photo-item"><img src="z.jpg"></div>
+                        <div class="photo-item"><img src="ture.jpg"></div>
+                        <div class="photo-item"><img src="toge.jpg"></div>
+                        <div class="photo-item"><img src="za.jpg"></div>
+                        <div class="photo-item"><img src="w.jpg"></div>
+                        <div class="photo-item"><img src="intrams1.png.jpg"></div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STORY 6 SCHOOL ACTS-->
+        <div class="story-card" onclick="toggleCard(this)">
+            <div class="card-preview">
+                <img src="balua.jpg" alt="Study group">
+                <div class="preview-overlay">
+                    <div class="preview-title">SCHOOL ACTIVITIES</div>
+                    <div class="preview-text"></div>
+                </div>
+                <div class="expand-icon">👀</div>
+            </div>
+            <div class="full-content">
+                <h3 class="story-title">TERESA</h3>
+                <p class="story-text">School activities we do in Teresa involve many different tasks—sometimes individual, and sometimes by group. For example, during our final examinations every first and second semester, some require group presentations while others are done individually.
+
+One of the most enjoyable activities for me was when we created a film for our Contemporary subject. I really enjoyed that experience because we went to Intramuros and filmed a video about its history. Aside from that, we also worked on our film for Philippine Literature titled Barya Lang Po sa Umaga</p>
+
+ <p class="story-text">Most of our activities are group-based to teach us how to collaborate with our classmates. This helps prepare us for the professional field so we can communicate and work well with others in the future. Through these activities, we learned how to help one another and share ideas—especially during our exhibit project. That experience was a big help in allowing us to know each other better, understand one another’s personalities, and choose good groupmates as we approach our third year.</p>
+                 
+                 
+                <div class="photo-grid">
+                    <button class="scroll-arrow scroll-left" onclick="scrollPhotoGrid(this)">‹</button>
+                    <button class="scroll-arrow scroll-right" onclick="scrollPhotoGrid(this)">›</button>
+                    <div class="photo-list">
+                        <div class="photo-item"><img src="skol.jpg" alt="Study group"></div>
+                        <div class="photo-item"><img src="a.jpg" alt="Notes everywhere"></div>
+                        <div class="photo-item"><img src="h.jpg"></div>  <div class="photo-item"><img src="tuwa.jpg"></div>
+                        <div class="photo-item"><img src="i.jpg"></div> <div class="photo-item"><img src="qqq.jpg"></div>
+                      
+                        <div class="photo-item"><img src="ros.jpg"></div>
+                        <div class="photo-item"><img src="acts.jpg"></div>
+                        <div class="photo-item"><img src="skols.jpg"></div>
+                        <div class="photo-item"><img src="mur.jpg"></div>
+                        <div class="photo-item"><img src="chu.jpg"></div>
+                        <div class="photo-item"><img src="vid.jpg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+            
+            // Close other cards
+            document.querySelectorAll('.story-card').forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove('expanded');
+                }
+            });
+        }
+
+        function scrollPhotoGrid(button) {
+            const photoGrid = button.parentElement;
+            const photoList = photoGrid.querySelector('.photo-list');
+            const scrollAmount = window.innerWidth > 768 ? 300 : 250;
+            
+            if (button.classList.contains('scroll-left')) {
+                photoList.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                photoList.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // Auto-hide arrows when not needed
+        document.querySelectorAll('.photo-grid').forEach(grid => {
+            const photoList = grid.querySelector('.photo-list');
+            const arrows = grid.querySelectorAll('.scroll-arrow');
+            
+            const checkArrows = () => {
+                const maxScroll = photoList.scrollWidth - photoList.clientWidth;
+                const currentScroll = photoList.scrollLeft;
+                
+                if (currentScroll <= 5) {
+                    arrows[0].style.opacity = '0.3';
+                    arrows[0].style.cursor = 'default';
+                } else {
+                    arrows[0].style.opacity = '1';
+                    arrows[0].style.cursor = 'pointer';
+                }
+                
+                if (currentScroll >= maxScroll - 5) {
+                    arrows[1].style.opacity = '0.3';
+                    arrows[1].style.cursor = 'default';
+                } else {
+                    arrows[1].style.opacity = '1';
+                    arrows[1].style.cursor = 'pointer';
+                }
+            };
+            
+            photoList.addEventListener('scroll', checkArrows);
+            checkArrows();
+        });
+    </script>
+</body>
+</html>
